@@ -1,0 +1,36 @@
+# Deploys one asset to poc-dev. Mirrors adhoc-deploy.yml in
+# release-nga-dataproducts: the run name has no version, so Meridian takes the
+# version from the deploy job name. Set "fail" to see a failed run record.
+name: POC ad-hoc deploy
+run-name: Ad-hoc deploy ${{ inputs.asset }} to poc-dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      asset:
+        description: Asset to deploy
+        type: choice
+        options:
+          - data-product-alpha
+          - data-product-beta
+      version:
+        description: Version to deploy (must contain a digit)
+        type: string
+        default: 1.0.0
+      fail:
+        description: Make the deploy job fail
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Ad-hoc (${{ inputs.asset }} ${{ inputs.version }})
+    uses: ./.github/workflows/template-deploy.yml
+    with:
+      asset: ${{ inputs.asset }}
+      version: ${{ inputs.version }}
+      environment-name: poc-dev
+      fail: ${{ inputs.fail }}
